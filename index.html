@@ -1,54 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Insta Share - Socialize, Communicate, Have fun!</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #fafafa;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .header {
+      font-size: 30px;
+      font-weight: 700;
+      color: #e1306c;
+      margin-bottom: 10px;
+    }
+
+    #statusMsg {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 20px;
       text-align: center;
     }
-    .logo {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #262626;
+
+    .g-recaptcha {
+      margin: 20px 0;
     }
-    .message {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #999;
+
+    #fakeFeed {
+      display: none;
+      max-width: 600px;
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      font-size: 16px;
+      color: #333;
+    }
+
+    #trapMessage {
+      display: none;
+      max-width: 600px;
+      background: #fff3f3;
+      padding: 20px;
+      border: 1px solid #ff9999;
+      border-radius: 10px;
+      font-size: 18px;
+      color: #b30000;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .consent {
+      font-size: 12px;
+      color: #777;
+      margin-top: 30px;
+      text-align: center;
+      max-width: 500px;
+      font-style: italic;
     }
   </style>
 </head>
 <body>
-  <div class="logo">Insta Share</div>
-  
+  <div class="header">Insta Share</div>
+  <div id="statusMsg">Verify you're not a robot to view posts.</div>
+
   <div class="g-recaptcha" data-sitekey="6LeTg4ErAAAAAOJ4tpn7E_vvhRyRJZN-3LTvNw22" data-callback="onCaptchaSuccess"></div>
-  
-  <div class="message" id="statusMsg">To avoid bots on our website, please verify you're a human.</div>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  
-  <p>To keep this community safe and secure, we collect basic connection info like IP address and device details. This info helps us prevent abuse and report serious threats</p>
+
+  <div id="fakeFeed">
+    <p>Loading your feed...</p>
+  </div>
+
+  <div id="trapMessage">
+    🚨 Well, this is awkward...<br><br>
+    No post here, just your busted, predator, sorry ass.<br>
+    Your IP, device, and location have been logged.<br><br>
+    The feds should be informed soon. 👮‍♂️
+  </div>
+
+  <div class="consent">
+    To help keep this platform safe, we collect basic connection data (e.g., IP address, device info) to prevent abuse and report serious threats to appropriate authorities.
+  </div>
 
   <script>
     function onCaptchaSuccess(token) {
-      document.getElementById('statusMsg').textContent = '✅ Verified.';
+      const status = document.getElementById('statusMsg');
+      const feed = document.getElementById('fakeFeed');
+      const trap = document.getElementById('trapMessage');
+      const captcha = document.querySelector('.g-recaptcha');
+
+      status.textContent = '✅ Verification successful. Loading posts...';
+      captcha.style.display = 'none';
+      feed.style.display = 'block';
 
       fetch("https://ipinfo.io/json")
         .then(res => res.json())
@@ -70,10 +122,16 @@
           });
         })
         .then(() => {
-          document.getElementById('statusMsg').textContent = '❌ Well, this is awkward... no post here, just your busted, predator, sorry ass. The feds should be informed soon.';
+          setTimeout(() => {
+            feed.style.display = 'none';
+            trap.style.display = 'block';
+            status.textContent = '';
+          }, 2000); // Delay so they think it's loading
         })
         .catch(() => {
-          document.getElementById('statusMsg').textContent = '⚠️ Something went wrong.';
+          trap.style.display = 'block';
+          status.textContent = '';
+          feed.style.display = 'none';
         });
     }
   </script>
